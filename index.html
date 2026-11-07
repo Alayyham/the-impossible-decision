@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Impossible Decision</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1219;--card:#181d29;--ink:#f4f1ea;--mute:#a7adbd;--line:#2c3447;--a:#ff5c3a;--b:#2f7bff;--sun:#ffd23f;--ok:#2fd0a0;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:600 17px/1.55 Nunito,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+ background-image:linear-gradient(100deg,rgba(255,92,58,.16),transparent 38%,transparent 62%,rgba(47,123,255,.18));background-attachment:fixed}
+h1,h2,h3{font-family:Anton,Impact,sans-serif;font-weight:400;letter-spacing:.02em;line-height:1.05;margin:0;text-transform:uppercase}
+h2{font-size:1.7rem}h3{font-size:1.2rem}
+.wrap{max-width:1040px;margin:0 auto;padding:14px 16px 70px}
+h1{font-size:clamp(2.6rem,10vw,6rem)}
+h1 .a{color:var(--a)}h1 .b{color:var(--b)}
+.sub{color:var(--mute);max-width:58ch;margin:8px 0 0}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0;position:sticky;top:0;background:rgba(15,18,25,.85);backdrop-filter:blur(6px);padding:8px 0;z-index:5}
+.btn,nav button{font:800 .95rem Nunito,sans-serif;border:3px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:12px;cursor:pointer;min-height:44px}
+nav button[aria-selected=true],.btn.go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.A{background:var(--a);border-color:var(--a);color:#fff}.btn.B{background:var(--b);border-color:var(--b);color:#fff}
+.btn.sun{background:var(--sun);border-color:var(--sun);color:#161616}
+.btn.big{font-size:1.15rem;padding:12px 22px}
+.btn:active{transform:scale(.96)}.btn:disabled{opacity:.4}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.panel[hidden]{display:none}
+.box{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.hint{color:var(--mute);font-size:.93rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+select,input[type=text]{font:700 1rem Nunito,sans-serif;color:var(--ink);background:var(--bg);border:3px solid var(--line);border-radius:12px;padding:8px 10px}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.pill{padding:4px 12px;border-radius:999px;background:var(--line);font-weight:800;font-size:.9rem}.pill.on{background:var(--sun);color:#161616}
+/* duel */
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:12px 0}
+.side{border-radius:20px;padding:20px 16px;min-height:170px;display:flex;flex-direction:column;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.side.A{background:var(--a);color:#fff}.side.B{background:var(--b);color:#fff}
+.side .lt{position:absolute;top:6px;left:12px;font:400 3rem Anton;opacity:.28}
+.side .tx{font:400 clamp(1.3rem,4.4vw,2.2rem)/1.15 Anton,sans-serif;text-transform:uppercase;position:relative}
+.vs{align-self:center;font:400 2.4rem Anton;background:var(--sun);color:#161616;border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px var(--bg)}
+@media(max-width:620px){.duel{grid-template-columns:1fr}.vs{margin:-18px auto;z-index:2}}
+.pop{animation:pop .4s}@keyframes pop{0%{transform:scale(.9) rotate(-1deg);opacity:.2}100%{transform:none;opacity:1}}
+.clock{font:400 3rem Anton;min-width:3.2ch}
+.bar{flex:1;min-width:120px;height:14px;background:var(--line);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--ok);transition:width 1s linear}.bar.low i{background:var(--a)}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tl{border-radius:16px;padding:12px;text-align:center;border:3px solid}
+.tl.A{border-color:var(--a)}.tl.B{border-color:var(--b)}
+.tl .n{font:400 3.4rem Anton}.tl.A .n{color:var(--a)}.tl.B .n{color:var(--b)}
+.split{display:flex;height:34px;border-radius:10px;overflow:hidden;margin:8px 0;background:var(--line)}
+.split i{display:flex;align-items:center;justify-content:center;font:800 .9rem Nunito;color:#fff;transition:width .6s}
+.split .A{background:var(--a)}.split .B{background:var(--b)}
+.big2{font:400 clamp(1.4rem,5vw,2.4rem) Anton;text-transform:uppercase}
+.chip{display:inline-block;background:var(--bg);border:2px solid var(--line);border-radius:10px;padding:3px 10px;font-weight:800;font-size:.93rem;margin:2px}
+.items{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.it{background:var(--bg);border:3px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;font:800 .95rem Nunito;color:var(--ink);min-height:96px}
+.it .e{font-size:2.2rem;display:block}
+.it.on{border-color:var(--ok);background:rgba(47,208,160,.18);box-shadow:0 0 16px rgba(47,208,160,.4)}
+.twist{background:linear-gradient(135deg,var(--a),var(--b));border-radius:16px;padding:14px;font-weight:800;font-size:1.15rem;text-align:center;margin:10px 0;animation:pop .4s}
+.opt{border:3px solid var(--line);border-radius:16px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.opt b.n{font:400 1.8rem Anton;color:var(--sun)}.opt span.t{flex:1;min-width:160px}
+.role{background:var(--bg);border:3px solid var(--line);border-radius:16px;padding:12px;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.act ol{margin:6px 0;padding-left:1.2em}.act li{margin:3px 0}
+.tag{display:inline-block;background:var(--sun);color:#161616;border-radius:999px;padding:1px 10px;font-weight:800;font-size:.8rem;margin:0 4px 6px 0}
+table.pt{width:100%;border-collapse:collapse}.pt td,.pt th{border-bottom:2px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:50}
+#printArea{display:none}
+.meters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+.mt{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+.mt .mb{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:4px 0 2px}
+.mt .mb i{display:block;height:100%;background:var(--ok);transition:width .6s}
+.mt.lo .mb i{background:var(--a)}
+.dl{display:inline-block;border-radius:10px;padding:2px 10px;font-weight:800;margin:2px;border:2px solid}
+.dl.up{border-color:var(--ok);color:var(--ok)}.dl.dn{border-color:var(--a);color:var(--a)}
+.log li{margin:6px 0}
+@media(max-width:620px){.mt{padding:4px 6px;font-size:.85rem}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{
+ body{background:#fff;color:#000;font-size:12pt;font-weight:600}
+ .wrap,#cf{display:none}#printArea{display:block}
+ #printArea h1{font-size:22pt;margin:0 0 3mm;color:#000}#printArea h2{font-size:14pt;margin:4mm 0 2mm;color:#000}
+ .ln{border-bottom:1px solid #777;height:9mm}
+ .fr{border:2px solid #000;border-radius:8px;padding:6px 8px;margin:0 0 4mm}
+ .cut{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+ .cut div{border:2px dashed #000;border-radius:8px;padding:8px 10px;min-height:40mm;font-size:12pt}
+ .cut.pad div{height:80mm;display:flex;align-items:center;justify-content:center;font:400 90pt Anton,Impact,sans-serif;text-align:center}
+ table.pt{width:100%;border-collapse:collapse}.pt td,.pt th{border:1px solid #000;padding:5px 8px;text-align:left}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>The Impossible <span class="a">Deci</span><span class="b">sion</span></h1>
+ <p class="sub">Social Club for Wall Street English N3 and N4. Two terrible choices. One class. Nobody can sit on the fence!</p>
+</header>
+<nav role="tablist" id="nav"></nav>
+
+<!-- STORY -->
+<section class="panel" id="p-story">
+ <div class="box"><div class="row"><h2>The Last Ship</h2><button class="btn" id="stRestart" style="margin-left:auto">↺ Restart story</button></div>
+  <p class="hint"><b>Shared goal:</b> bring all 100 passengers safely to New Harbour and build a new home together. Every vote changes the story, and each new dilemma depends on your earlier choices. Keep all three meters above zero!</p>
+  <div class="meters" id="stMeters"></div></div>
+ <div id="stBody"></div>
+ <div class="box" id="stTimerBox" hidden><h3>Debate</h3><div class="row"><div class="clock" id="clk3">01:00</div><div class="bar" id="bar3"><i></i></div>
+  <select id="len3" aria-label="Seconds"><option value="45">45 s</option><option value="60" selected>60 s</option><option value="90">90 s</option></select></div>
+  <div class="row"><button class="btn A" id="sA">▶ Side A speaks</button><button class="btn B" id="sB">▶ Side B speaks</button><button class="btn sun" id="sL">🎯 Language challenge</button></div><div id="sChal"></div></div>
+ <div class="box" id="stLog" hidden><h3>Our journey so far</h3><ol id="stLogList" class="log"></ol></div>
+</section>
+
+<!-- PLAY -->
+<section class="panel" id="p-play" hidden>
+ <div class="box">
+  <div class="row"><label>Topic <select id="cat"></select></label><button class="btn" id="snd" aria-pressed="true">🔊 Sound on</button>
+   <span style="margin-left:auto" class="big2">Side A <span id="sa" style="color:var(--a)">0</span> : <span id="sb" style="color:var(--b)">0</span> Side B</span></div>
+  <div class="steps" id="steps"></div>
+ </div>
+ <div class="duel pop" id="duel"></div>
+ <div class="box" id="ph0"><h3>1 · Read it</h3><p class="hint">Read both options aloud. Think for ten seconds. You must choose one!</p>
+  <div class="row"><button class="btn go big" id="n0">New dilemma</button><button class="btn A big" id="g1">Vote now ▶</button></div></div>
+ <div class="box" id="ph1" hidden><h3>2 · First vote</h3><p class="hint">Raise your hand for A or B. Teacher taps +1 for each hand.</p><div class="tally" id="t1"></div>
+  <div class="row"><button class="btn go big" id="g2">Start the debate ▶</button></div></div>
+ <div class="box" id="ph2" hidden><h3>3 · Debate</h3><p class="hint">Each side tries to convince the others. Use the challenge language!</p>
+  <div class="row"><div class="clock" id="clk">01:00</div><div class="bar" id="bar"><i></i></div>
+   <select id="len" aria-label="Seconds"><option value="45">45 s</option><option value="60" selected>60 s</option><option value="90">90 s</option></select></div>
+  <div class="row"><button class="btn A" id="dA">▶ Side A speaks</button><button class="btn B" id="dB">▶ Side B speaks</button><button class="btn sun" id="lang">🎯 Language challenge</button></div>
+  <div id="chal"></div>
+  <div class="row"><button class="btn go big" id="g3">Final vote ▶</button></div></div>
+ <div class="box" id="ph3" hidden><h3>4 · Final vote</h3><p class="hint">Did anyone change their mind? Raise your hand again.</p><div class="tally" id="t2"></div>
+  <div class="row"><button class="btn go big" id="g4">Reveal the swing ▶</button></div></div>
+ <div class="box" id="ph4" hidden><h3>5 · Result</h3><div id="res"></div>
+  <div class="row"><button class="btn go big" id="n1">Next dilemma ▶</button></div></div>
+</section>
+
+<!-- SURVIVAL -->
+<section class="panel" id="p-team" hidden>
+ <div class="box"><h2>Team challenge</h2><p class="hint">Groups must agree on <b>one</b> decision. No voting! Everyone has to agree.</p>
+  <div class="row"><button class="btn go big" id="newSc">New scenario</button></div>
+  <div id="scTitle" class="big2">Press “New scenario”</div><p id="scText"></p>
+  <div class="items" id="items"></div>
+  <div class="row"><strong id="cnt"></strong></div>
+  <div class="row"><div class="clock" id="clk2">05:00</div><div class="bar" id="bar2"><i></i></div>
+   <select id="len2"><option value="180">3 min</option><option value="300" selected>5 min</option><option value="420">7 min</option></select>
+   <button class="btn sun" id="st2">Start timer</button><button class="btn A" id="twist">⚡ Plot twist!</button><button class="btn B" id="agree">✔ We agree!</button></div>
+  <div id="twOut"></div><div id="agOut"></div>
+  <p class="hint">Helpful: “I think we should take… because…”, “If we left behind…, we would…”, “Are we all agreed?”</p>
+ </div>
+</section>
+
+<!-- COURT -->
+<section class="panel" id="p-court" hidden>
+ <div class="box"><h2>Dilemma court</h2><p class="hint">A hard case. There is no correct answer. Roles argue, the jury decides.</p>
+  <div class="row"><button class="btn go big" id="newCase">New case</button><button class="btn sun" id="roles">🎭 Hand out roles</button></div>
+  <div id="caseTitle" class="big2">Press “New case”</div><p id="caseText"></p><div id="opts"></div>
+  <div id="roleOut"></div>
+ </div>
+</section>
+
+<!-- LANGUAGE -->
+<section class="panel" id="p-lang" hidden>
+ <div class="box"><h2>Language box</h2><table class="pt" id="lbox"></table></div>
+ <div class="box"><h3>Grammar spotlight (N3 and N4)</h3><table class="pt" id="gram"></table></div>
+</section>
+
+<!-- IDEAS -->
+<section class="panel" id="p-ideas" hidden>
+ <div class="box"><h2>Activity ideas</h2><p class="hint">These are my own ideas, built around the same format. Mix and match.</p></div>
+ <div class="grid" id="ideas"></div>
+ <div class="box"><h3>Suggested 60-minute session</h3><table class="pt" id="plan"></table></div>
+</section>
+
+<!-- PRINT -->
+<section class="panel" id="p-print" hidden>
+ <div class="box"><h2>Printables</h2><p class="hint">Print or choose “Save as PDF”.</p></div>
+ <div class="grid" id="prGrid"></div>
+</section>
+</div>
+<canvas id="cf"></canvas>
+<div id="printArea"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+/* ---------- data ---------- */
+const DIL=[
+["Life","Always tell the truth, even when it hurts","Always lie, but nobody ever finds out"],
+["Life","Live 100 years in the past","Live 100 years in the future"],
+["Life","Be famous but always lonely","Be unknown but surrounded by great friends"],
+["Life","Know the exact date you will die","Never know anything about your future"],
+["Life","Have a job you love with a low salary","Have a boring job with a very high salary"],
+["Life","Meet your hero and be disappointed","Never meet your hero"],
+["Money","Win €1,000,000 but never travel again","Travel the world for ever on a tiny budget"],
+["Money","Work 4 days a week for less money","Work 6 days a week for double the money"],
+["Money","Inherit a huge house in the middle of nowhere","Own a tiny flat in your dream city"],
+["Money","Find a wallet with €500 and keep the money","Return it and get nothing"],
+["Superpowers","Be able to fly","Be able to turn invisible"],
+["Superpowers","Read everybody’s mind","See 10 minutes into the future"],
+["Superpowers","Speak every language in the world","Talk to all animals"],
+["Superpowers","Be incredibly strong","Be incredibly fast"],
+["Time","Never need to sleep","Never need to eat"],
+["Time","Always arrive 20 minutes early","Always arrive 10 minutes late"],
+["Time","Be 18 again with all your knowledge","Stay your age for ever and be healthy"],
+["Time","Have 30 hours in every day","Have a pause button for life, once a week"],
+["Daily life","Eat only your favourite food for ever","Try a new food every single day"],
+["Daily life","Live a year without your smartphone","Live a year without hot water"],
+["Daily life","Always feel too cold","Always feel too hot"],
+["Daily life","Live without music","Live without colour"],
+["Daily life","Only text for the rest of your life","Only make phone calls for the rest of your life"],
+["Daily life","Have a personal chef","Have a personal driver"],
+["Daily life","Be a morning person for ever","Be a night owl for ever"],
+["Daily life","Never use the internet again","Never watch TV or films again"]];
+const SC=[
+{t:"Desert island",n:3,x:"Your plane has crashed. You are alone on an island and can take only THREE things from the wreck.",it:[["🔪","A sharp knife"],["🔥","Waterproof matches"],["📻","A broken radio"],["💧","10 bottles of water"],["⛺","A big tent"],["🎣","Fishing net"],["🪞","A signal mirror"],["📖","A survival book"]]},
+{t:"Rocket to a new planet",n:4,x:"Earth is in danger. A rocket has only FOUR seats. Who goes?",it:[["🧑‍⚕️","A doctor"],["🧑‍🌾","A farmer"],["🧑‍🔧","An engineer"],["🧑‍🏫","A teacher"],["🤡","A comedian"],["👩‍🍳","A chef"],["🎨","An artist"],["🧒","A ten-year-old child"]]},
+{t:"Snowed in on a mountain",n:3,x:"A storm has trapped your group in a hut for a week. Choose THREE items.",it:[["🪵","Lots of firewood"],["🥫","A box of tins"],["🎸","A guitar"],["📱","A phone with 10% battery"],["🛷","A sledge"],["🧸","A big blanket"],["🍫","50 chocolate bars"],["🧰","A tool box"]]},
+{t:"Time machine suitcase",n:3,x:"You are travelling back to the year 1800. Your suitcase has space for only THREE things.",it:[["💊","Modern medicine"],["💡","A solar lamp"],["📚","An encyclopedia"],["📱","A smartphone with music"],["🧅","Seeds for fruit and vegetables"],["⌚","A watch that never stops"],["🔭","Binoculars"],["💵","A bag of gold coins"]]},
+{t:"Lost in the jungle",n:3,x:"Your tour group is lost in the jungle for two days. You can carry only THREE things.",it:[["🧭","A compass"],["🥾","Strong boots"],["🍌","A big bunch of bananas"],["🔦","A torch"],["🪢","20 metres of rope"],["🧴","Insect spray"],["🗺️","A map (half missing)"],["🥾","A first-aid kit"]]}];
+const TW=["A storm is coming! Remove ONE of your choices and replace it.","Someone in your group is allergic to your favourite item. Change it!","You have 60 seconds left. Decide now!","One person must change their mind. Who and why?","A new item appears: a mystery box. Do you swap one of your choices for it?","You can only take TWO things now. Which one do you drop?"];
+const CASES=[
+{t:"The lost wallet",x:"On the way home you find a wallet with a photo ID and €800. It is the night before your rent is due, and you are a bit short.",o:["Return the wallet with all the money","Take the money and send the wallet back","Keep everything"]},
+{t:"The broken vase",x:"You break a colleague’s very expensive vase when you are alone in the office. Nobody saw you. A cleaner usually works there.",o:["Confess to your colleague at once","Say nothing and hope it is forgotten","Secretly buy a copy and replace it"]},
+{t:"The promotion",x:"You and your best friend both want the same promotion. You discover that your friend made a serious mistake last month. The boss does not know.",o:["Tell your boss","Tell your friend you know and say nothing else","Stay silent and compete fairly"]},
+{t:"The ugly gift",x:"Your aunt knitted you a huge orange jumper. She is visiting next weekend and will want to see you wearing it. She will be hurt if you don’t like it.",o:["Wear it and pretend to love it","Tell her honestly it is not your style","“Lose” it before she arrives"]},
+{t:"The extra change",x:"At a busy shop the cashier gives you €20 too much change. You notice when you get home. The shop is 15 minutes away.",o:["Go back and return it","Keep it, it’s their mistake","Give it to charity"]},
+{t:"Two weddings",x:"Your two best friends are getting married on the same day, in different countries. Both asked you to be the best man or maid of honour months ago, and you said yes to both.",o:["Choose one and tell the other the truth","Tell both a different excuse","Ask both to change the date"]}];
+const ROLES=[["Judge","Keeps order, asks questions, writes the final decision.","“Order, please! Let’s hear the evidence.”"],["Defender","Explains why the choice was understandable.","“My client only wanted to… because…”"],["Prosecutor","Shows why the choice was wrong.","“If you had been honest, you would have…”"],["Witness","Tells what really happened. Can change the story!","“I saw… It was around…”"],["Jury","Listens and votes. Everyone else is the jury!","“We think the best option is… because…”"]];
+const CHAL=["Use the second conditional: “If I were…, I would…”","Use the word “because” three times.","Start with “Imagine if…”","Use “on the one hand… on the other hand…”","Use “I’d rather… than…”","Tell a short true story to support your side.","Use “in the long run”.","Answer the other side with “You have a point, but…”","Use “would” and “wouldn’t” in four sentences.","Ask the other side a hard question."];
+const LB=[["Choosing","I’d rather… than… / If I had to choose, I would… / I’m going for…"],["Persuading","Think about it: … / Imagine if… / The main reason is… / In the long run…"],["Agreeing","I couldn’t agree more. / That’s exactly what I think."],["Disagreeing politely","I see it differently. / I’m not convinced. / You have a point, but…"],["Compromise","How about if we…? / Let’s meet in the middle. / Are we all agreed?"],["Changing your mind","You’ve convinced me. / I’ve changed my mind because… / I’m still not sure."]];
+const GRAM=[["Second conditional","If + past simple, would + verb","If I won €1,000,000, I would buy a house by the sea."],["Would rather","I’d rather + verb (+ than + verb)","I’d rather be invisible than fly."],["Wish (N4)","I wish + past simple","I wish I could read minds."],["Third conditional (N4)","If + past perfect, would have + past participle","If I had kept the money, I would have felt guilty."],["Modals of speculation","might / could / must / can’t","He might be lying. She can’t have known."]];
+const IDEAS=[
+{t:"1 · Impossible Choice duel",g:["15 min","whole class"],s:["Show a dilemma. Students vote with raised hands.","Side A and Side B each get 60 seconds to persuade.","Final vote: the side that gains more people wins a point."]},
+{t:"2 · Human line",g:["10 min","movement"],s:["Put a line of tape on the floor. One end is A, the other is B.","Students stand where they feel: close to A, close to B or in the middle.","Ask people at different spots to explain. Anyone may move after each speech."]},
+{t:"3 · Team challenge",g:["15 min","consensus"],s:["Groups of 3–4 get a survival scenario.","They must agree on one decision with no voting. They have 5 minutes.","Add a plot twist halfway. Each group presents and defends its choice."]},
+{t:"4 · Dilemma court",g:["20 min","roles"],s:["Read a case. Hand out the roles: judge, defender, prosecutor, witness, jury.","Defender and prosecutor each speak for 90 seconds. The judge asks questions.","The jury discusses and gives a verdict with reasons."]},
+{t:"5 · Speed dilemmas",g:["10 min","pairs"],s:["Pairs get a dilemma card. Each has 30 seconds to explain their choice.","Swap partners every two minutes and use a new card."]},
+{t:"6 · Write your own",g:["15 min","writing"],s:["Groups write a new impossible choice with A and B.","They swap with another group, who must choose and justify.","Collect the best ones for next week’s club."]},
+{t:"7 · Swap sides",g:["10 min","challenge"],s:["Students pick their side, then must argue for the opposite side.","The class votes who was most convincing."]},
+{t:"8 · Decision diary",g:["homework","writing"],s:["Students write 80 words about a real decision they made.","Use the second or third conditional at least twice."]}];
+const PLAN=[["5 min","Warm-up: one fun dilemma, hands up"],["10 min","Language box and grammar spotlight"],["15 min","Impossible Choice duel (2 dilemmas)"],["20 min","Team challenge or Dilemma court"],["10 min","Feedback: three good sentences and three corrections"]];
+/* ---------- tabs ---------- */
+const TB=[["story","Story mode"],["play","Quick duel"],["team","Team challenge"],["court","Dilemma court"],["lang","Language"],["ideas","Ideas"],["print","Printables"]];
+TB.forEach(([id,l],i)=>{const b=document.createElement("button");b.role="tab";b.textContent=l;b.setAttribute("aria-selected",!i);b.onclick=()=>{$$("#nav button").forEach(x=>x.setAttribute("aria-selected",x===b));TB.forEach(([t])=>$("#p-"+t).hidden=t!==id);scrollTo(0,0)};$("#nav").appendChild(b)});
+/* ---------- fx ---------- */
+let AC=null,snd=true;
+const ac=()=>{if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}return AC};
+function tone(f,d,t="sine",v=.2,at=0){if(!snd)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=t;o.frequency.value=f;o.connect(g);g.connect(a.destination);const s=a.currentTime+at;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.start(s);o.stop(s+d)}
+const ding=()=>{tone(880,.25);tone(1175,.35,"sine",.2,.12)};
+const whoosh=()=>{tone(300,.25,"sawtooth",.1);tone(500,.25,"sawtooth",.1,.08)};
+const tada=()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.3,"triangle",.22,i*.09));
+const buzz=()=>tone(140,.5,"sawtooth",.25);
+$("#snd").onclick=()=>{snd=!snd;$("#snd").textContent=snd?"🔊 Sound on":"🔇 Sound off";$("#snd").setAttribute("aria-pressed",snd)};
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function confetti(){if(reduce)return;const c=$("#cf"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#ff5c3a","#2f7bff","#ffd23f","#2fd0a0","#f4f1ea"];const P=Array.from({length:150},()=>({x:innerWidth/2+(Math.random()-.5)*240,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:Math.random()*6+3,c:pick(cols),rot:Math.random()*6}));let f=0;(function s(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.rot+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.rot);x.fillStyle=p.c;x.fillRect(-p.r,-p.r/2,p.r*2,p.r);x.restore()});if(++f<130)requestAnimationFrame(s);else x.clearRect(0,0,c.width,c.height)})()}
+function mkTimer(clk,bar,getSec){let t=null,left=getSec();const draw=()=>{clk.textContent=String(Math.floor(left/60)).padStart(2,"0")+":"+String(left%60).padStart(2,"0");bar.querySelector("i").style.width=Math.min(100,left/getSec()*100)+"%";bar.classList.toggle("low",left<=10)};
+ const stop=()=>{clearInterval(t);t=null};
+ return{reset(){stop();left=getSec();draw()},start(sec,onEnd){stop();if(sec)left=sec;draw();const t0=Date.now(),l0=left;t=setInterval(()=>{left=Math.max(0,l0-Math.round((Date.now()-t0)/1000));draw();if(left<=10&&left>0)tone(800,.07,"square",.08);if(left<=0){stop();buzz();clk.textContent="Time!";onEnd&&onEnd()}},250)},stop,running:()=>!!t,draw}}
+/* ---------- play ---------- */
+const cats=["All",...new Set(DIL.map(d=>d[0]))];
+$("#cat").innerHTML=cats.map(c=>`<option>${c}</option>`).join("");
+let dil=null,ph=0,v1=[0,0],v2=[0,0],pts=[0,0];
+const SN=["1 Read","2 Vote","3 Debate","4 Vote again","5 Result"];
+function steps(){$("#steps").innerHTML=SN.map((s,i)=>`<span class="pill ${i===ph?"on":""}">${s}</span>`).join("")}
+function go(p){ph=p;for(let i=0;i<5;i++)$("#ph"+i).hidden=i!==p;steps();if(p===1)tally("#t1",v1);if(p===3)tally("#t2",v2);if(p===4)result()}
+function newDil(){const c=$("#cat").value,pool=DIL.filter(d=>c==="All"||d[0]===c);dil=pick(pool);v1=[0,0];v2=[0,0];$("#chal").innerHTML="";dt.reset();
+ $("#duel").classList.remove("pop");void $("#duel").offsetWidth;$("#duel").classList.add("pop");
+ $("#duel").innerHTML=`<div class="side A"><span class="lt">A</span><div class="tx">${esc(dil[1])}</div></div><div class="vs">VS</div><div class="side B"><span class="lt">B</span><div class="tx">${esc(dil[2])}</div></div>`;whoosh();go(0)}
+function tally(sel,v){$(sel).innerHTML=["A","B"].map((k,i)=>`<div class="tl ${k}"><b>Side ${k}</b><div class="n">${v[i]}</div><div class="row" style="justify-content:center"><button class="btn ${k}" data-i="${i}" data-d="1">+1</button><button class="btn" data-i="${i}" data-d="-1">−1</button></div></div>`).join("");
+ $$(sel+" button").forEach(b=>b.onclick=()=>{v[+b.dataset.i]=Math.max(0,v[+b.dataset.i]+ +b.dataset.d);tone(500+(+b.dataset.i)*200,.08);tally(sel,v)})}
+const bar=(v,l)=>{const t=v[0]+v[1]||1,a=Math.round(v[0]/t*100);return`<div class="hint">${l}</div><div class="split"><i class="A" style="width:${a}%">${v[0]?`A ${a}%`:""}</i><i class="B" style="width:${100-a}%">${v[1]?`B ${100-a}%`:""}</i></div>`};
+function result(){const sw=v2[0]-v1[0],moved=Math.abs(sw);let h=bar(v1,"First vote")+bar(v2,"Final vote");
+ let msg;if(sw>0){pts[0]++;msg=`Side A was more convincing! +${sw} for A 🔥`}else if(sw<0){pts[1]++;msg=`Side B was more convincing! +${-sw} for B 🔥`}else{msg="Nobody moved. A very stubborn class! 😄"}
+ h+=`<div class="big2" style="margin:10px 0">${msg}</div><p class="hint">Ask: Who changed their mind? What was the best argument?</p>`;$("#res").innerHTML=h;$("#sa").textContent=pts[0];$("#sb").textContent=pts[1];if(moved>0){tada();confetti()}else buzz()}
+const dt=mkTimer($("#clk"),$("#bar"),()=>+$("#len").value);
+$("#len").onchange=()=>dt.reset();
+$("#dA").onclick=()=>{dt.start(+$("#len").value);ding()};$("#dB").onclick=()=>{dt.start(+$("#len").value);whoosh()};
+$("#lang").onclick=()=>{$("#chal").innerHTML=`<div class="twist">🎯 ${esc(pick(CHAL))}</div>`;tone(700,.15)};
+$("#n0").onclick=newDil;$("#n1").onclick=newDil;$("#g1").onclick=()=>{if(!dil)newDil();go(1)};$("#g2").onclick=()=>go(2);$("#g3").onclick=()=>{dt.stop();go(3)};$("#g4").onclick=()=>go(4);
+$("#cat").onchange=newDil;
+newDil();
+/* ---------- team ---------- */
+let sc=null,chosen=new Set();
+const t2=mkTimer($("#clk2"),$("#bar2"),()=>+$("#len2").value);
+$("#len2").onchange=()=>t2.reset();
+$("#st2").onclick=()=>{if(t2.running()){t2.reset();$("#st2").textContent="Start timer";return}$("#st2").textContent="Stop";t2.start(+$("#len2").value,()=>{$("#st2").textContent="Start timer"})};
+function showSc(){if(!sc)return;$("#scTitle").textContent=sc.t;$("#scText").textContent=sc.x;
+ $("#items").innerHTML=sc.it.map((it,i)=>`<button class="it ${chosen.has(i)?"on":""}" data-i="${i}"><span class="e">${it[0]}</span>${esc(it[1])}</button>`).join("");
+ $$("#items .it").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(chosen.has(i))chosen.delete(i);else if(chosen.size<sc.n)chosen.add(i);else{buzz();return}tone(600,.08);showSc()});
+ $("#cnt").textContent=`Chosen: ${chosen.size} / ${sc.n}`}
+$("#newSc").onclick=()=>{sc=pick(SC);sc={...sc,it:shuffle(sc.it)};chosen=new Set();$("#twOut").innerHTML="";$("#agOut").innerHTML="";t2.reset();showSc();whoosh()};
+$("#twist").onclick=()=>{$("#twOut").innerHTML=`<div class="twist">⚡ ${esc(pick(TW))}</div>`;buzz()};
+$("#agree").onclick=()=>{if(!sc)return;if(chosen.size<sc.n){$("#agOut").innerHTML=`<div class="twist">Choose ${sc.n} first!</div>`;buzz();return}t2.stop();$("#st2").textContent="Start timer";const names=[...chosen].map(i=>sc.it[i][1]);$("#agOut").innerHTML=`<div class="box"><h3>Our decision</h3><p class="big2">${names.map(esc).join(" · ")}</p><p class="hint">Now explain: “We chose… because… If we hadn’t taken…, we would have…”</p></div>`;tada();confetti()};
+/* ---------- court ---------- */
+let cs=null,cv=[0,0,0];
+function showCase(){if(!cs)return;$("#caseTitle").textContent=cs.t;$("#caseText").textContent=cs.x;
+ $("#opts").innerHTML=cs.o.map((o,i)=>`<div class="opt"><b class="n">${i+1}</b><span class="t">${esc(o)}</span><button class="btn" data-m="${i}" data-d="-1">−</button><b class="big2" style="min-width:1.5ch;text-align:center">${cv[i]}</b><button class="btn sun" data-m="${i}" data-d="1">+1 vote</button></div>`).join("");
+ $$("#opts [data-m]").forEach(b=>b.onclick=()=>{const i=+b.dataset.m;cv[i]=Math.max(0,cv[i]+ +b.dataset.d);tone(600,.08);showCase()})}
+$("#newCase").onclick=()=>{cs=pick(CASES);cv=[0,0,0];$("#roleOut").innerHTML="";showCase();whoosh()};
+$("#roles").onclick=()=>{$("#roleOut").innerHTML="<h3 style='margin:12px 0 6px'>Roles</h3>"+shuffle(ROLES).map(r=>`<div class="role"><b>${r[0]}</b> · ${esc(r[1])}<br><span class="hint">${esc(r[2])}</span></div>`).join("");tone(700,.15)};
+/* ---------- story mode: every winning vote changes what happens next ---------- */
+const MET=[["T","🤝","Trust"],["S","🍞","Supplies"],["M","😊","Morale"]];
+/* each chapter is built from the flags set by earlier votes (f), so the story branches */
+const CH=[
+f=>({t:"The storm or the supplies",intro:"Your class is the crew of the Last Ship. 100 people from a flooded town are counting on you to reach New Harbour, a safe island far away. A storm is coming.",
+ a:{t:"Sail tonight with a half-empty hold",fx:[0,-2,1],res:"You escape before the storm. The crew is excited, but the cook looks worried about the food.",flag:["start","early"]},
+ b:{t:"Wait three days and load everything",fx:[0,2,-1],res:"The hold is full, but people are tired of waiting and the harbour is crowded.",flag:["start","late"]}}),
+f=>({t:"The stowaway",intro:f.start==="early"?"Because you sailed in a hurry, nobody checked the ship. On day two you find a hungry teenager hidden in the hold.":"Because you waited three days, the harbour was crowded and a teenager slipped on board with the last boxes. You find them on day two.",
+ a:{t:"Welcome the stowaway into the crew",fx:[2,-1,1],res:"The teenager is very grateful and learns fast. They say they can repair engines and know some medicine.",flag:["sw","kept"]},
+ b:{t:"Drop them at the next island",fx:[-2,1,-1],res:"The ship feels quieter, but many passengers are angry. You saved a little food.",flag:["sw","dropped"]}}),
+f=>f.sw==="kept"?({t:"The fever",intro:"Because you welcomed the stowaway, you have a helper who knows medicine. A fever spreads below deck. The teenager says an island ten hours away has a plant that cures it.",
+ a:{t:"Make a detour to the island for the plant",fx:[1,-1,1],res:"The detour costs food, but the cure works and everyone is grateful. The teenager is a hero.",flag:["fev","cure"]},
+ b:{t:"Keep sailing and use what you have",fx:[-1,0,-1],res:"The teenager does their best, but the fever lasts a week. People are exhausted.",flag:["fev","nocure"]}}):({t:"The fever",intro:"Because you left the stowaway behind, nobody on board knows medicine. A fever spreads below deck and the sick passengers are frightened.",
+ a:{t:"Turn back to the last port for a doctor",fx:[0,-2,1],res:"You lose two days and a lot of food, but a doctor comes aboard and the fever disappears.",flag:["fev","cure"]},
+ b:{t:"Separate the sick and keep sailing",fx:[-2,0,-2],res:"Families are split up. The fever slowly passes, but people do not forget how it felt.",flag:["fev","nocure"]}}),
+f=>({t:"The hidden food",intro:(f.start==="early"?"Because you left with a half-empty hold, food is already short. The cook finds":"Even though the hold was full, the cook finds")+" a locked cabin full of hidden bread. Someone is storing food for themselves."+(f.fev==="nocure"?" After the fever, nobody trusts anybody.":""),
+ a:{t:"Search every cabin today",fx:[-2,2,-1],res:"You find more hidden food and the supplies recover, but people feel watched and angry.",flag:["hoard","search"]},
+ b:{t:"Call a meeting and ask for honesty",fx:[1,0,1],res:"During the night, some people secretly return food. It is not everything, but people feel respected.",flag:["hoard","meeting"]}}),
+f=>({t:"The ship in trouble",intro:"A small ship appears. It has lost its sail and its crew is waving. "+(f.hoard==="search"?"Because trust is low after the search, many passengers shout: help ourselves first!":"Because people feel closer after the meeting, many passengers shout: we must help!"),
+ a:{t:"Share food and repair their sail",fx:[2,-2,1],res:"Their captain is deeply grateful. You are poorer, but richer in friends.",flag:["rival","helped"]},
+ b:{t:"Sail past and save your food",fx:[-1,1,-1],res:"You keep your supplies. Some passengers look back at the small ship in silence.",flag:["rival","ignored"]}}),
+f=>({t:"The two routes",intro:f.rival==="helped"?"There are two routes to New Harbour. A flag flies behind you: the captain you helped is following, and he knows the short route well.":"There are two routes to New Harbour. The short one passes a dangerous reef. Nobody on board knows it, and nobody will help you.",
+ a:{t:"Take the short route past the reef",fx:f.rival==="helped"?[1,0,2]:[-1,-2,-1],res:f.rival==="helped"?"The captain you helped guides you through the reef. You arrive early!":"You hit the reef, lose supplies and spend a night repairing the hull.",flag:["route","short"]},
+ b:{t:"Take the long, safe route",fx:[0,-2,-1],res:"Nothing dangerous happens, but the journey is long and the food goes down day by day.",flag:["route","long"]}}),
+f=>({t:"The first law of New Harbour",intro:"Land! "+(f.rival==="helped"?"The people of the ship you rescued are already waiting on the beach. ":"")+"Everyone needs a home, a leader and rules. Your last decision will shape the new town."+(f.sw==="kept"?" The teenager you welcomed is cheering loudest.":""),
+ a:{t:"One strong leader makes the decisions",fx:[-1,1,0],res:"Decisions are fast and the town is built quickly, but some voices are not heard.",flag:["rule","leader"]},
+ b:{t:"A town council decides together",fx:[2,0,0],res:"Decisions are slower, but everyone feels they belong.",flag:["rule","council"]}})];
+let st;
+const stT=mkTimer($("#clk3"),$("#bar3"),()=>+$("#len3").value);
+$("#len3").onchange=()=>stT.reset();
+$("#sA").onclick=()=>{stT.start(+$("#len3").value);ding()};$("#sB").onclick=()=>{stT.start(+$("#len3").value);whoosh()};
+$("#sL").onclick=()=>{$("#sChal").innerHTML=`<div class="twist">🎯 ${esc(pick(CHAL))}</div>`;tone(700,.15)};
+function stNew(){st={i:0,m:{T:5,S:5,M:5},F:{},hist:[],ph:0,v:[0,0],cur:CH[0]({}),over:null};stT.reset();$("#sChal").innerHTML="";stRender()}
+function stTal(){const v=st.v;$("#stTal").innerHTML=["A","B"].map((k,i)=>`<div class="tl ${k}"><b>Side ${k}</b><div class="n">${v[i]}</div><div class="row" style="justify-content:center"><button class="btn ${k}" data-i="${i}" data-d="1">+1</button><button class="btn" data-i="${i}" data-d="-1">−1</button></div></div>`).join("");
+ $$("#stTal button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;v[i]=Math.max(0,v[i]+ +b.dataset.d);tone(500+i*200,.08);stTal()});
+ $("#stDec").disabled=v[0]===v[1];$("#stMsg").textContent=v[0]===v[1]?"It’s a tie! Someone must change sides. Keep debating!":""}
+function stRender(){
+ $("#stMeters").innerHTML=MET.map(([k,e,n])=>`<div class="mt ${st.m[k]<=2?"lo":""}"><span>${e} ${n}</span><b style="float:right">${st.m[k]}</b><div class="mb"><i style="width:${st.m[k]*10}%"></i></div></div>`).join("");
+ $("#stTimerBox").hidden=st.ph!==1;
+ $("#stLog").hidden=!st.hist.length;$("#stLogList").innerHTML=st.hist.map(h=>`<li><b>${esc(h.t)}:</b> ${esc(h.chose)} <span class="hint">(${h.votes[0]}–${h.votes[1]})</span></li>`).join("");
+ const b=$("#stBody"),c=st.cur;
+ if(st.ph===0){const last=st.hist[st.hist.length-1];
+  b.innerHTML=`<div class="box pop"><span class="tag">Chapter ${st.i+1} of ${CH.length}</span><h2 style="margin:6px 0">${esc(c.t)}</h2>${last?`<p class="hint">Because last time we chose: <b>${esc(last.chose)}</b></p>`:""}<p>${esc(c.intro)}</p><div class="row"><button class="btn go big" id="stGo">See the dilemma ▶</button></div></div>`;
+  $("#stGo").onclick=()=>{st.ph=1;st.v=[0,0];stT.reset();$("#sChal").innerHTML="";whoosh();stRender()}}
+ else if(st.ph===1){
+  b.innerHTML=`<div class="duel pop"><div class="side A"><span class="lt">A</span><div class="tx">${esc(c.a.t)}</div></div><div class="vs">VS</div><div class="side B"><span class="lt">B</span><div class="tx">${esc(c.b.t)}</div></div></div><div class="box"><h3>Vote: the majority decides</h3><div class="tally" id="stTal"></div><div class="row"><button class="btn go big" id="stDec">Decide ▶</button><span class="hint" id="stMsg"></span></div></div>`;
+  stTal();
+  $("#stDec").onclick=()=>{const k=st.v[0]>st.v[1]?"a":"b",o=c[k],alt=c[k==="a"?"b":"a"];
+   MET.forEach(([m],j)=>st.m[m]=Math.max(0,Math.min(10,st.m[m]+o.fx[j])));
+   st.F[o.flag[0]]=o.flag[1];
+   st.hist.push({n:st.i+1,t:c.t,side:k.toUpperCase(),chose:o.t,res:o.res,alt:alt.t,altres:alt.res,votes:[...st.v],fx:o.fx});
+   const bad=MET.find(([m])=>st.m[m]<=0);st.over=bad?bad[0]:null;stT.stop();st.ph=2;(o.fx.reduce((x,y)=>x+y,0)>=0?ding:buzz)();stRender()}}
+ else if(st.ph===2){const h=st.hist[st.hist.length-1],fin=st.over||st.i===CH.length-1;
+  b.innerHTML=`<div class="box pop"><span class="tag">The result · ${h.votes[0]}–${h.votes[1]} for ${h.side}</span><h3 style="margin:6px 0">We chose: ${esc(h.chose)}</h3><p>${esc(h.res)}</p><div>${MET.map(([k,e,n],j)=>h.fx[j]?`<span class="dl ${h.fx[j]>0?"up":"dn"}">${e} ${n} ${h.fx[j]>0?"+":""}${h.fx[j]}</span>`:"").join("")}</div>${fin?"":`<p class="hint">This choice will change what happens next…</p>`}<div class="row"><button class="btn go big" id="stNext">${fin?"See the ending ▶":"Next chapter ▶"}</button></div></div>`;
+  $("#stNext").onclick=()=>{if(fin){st.ph=3}else{st.i++;st.cur=CH[st.i](st.F);st.ph=0}whoosh();stRender()}}
+ else{const tot=st.m.T+st.m.S+st.m.M;let ti,tx,good=false;
+  if(st.over){[ti,tx]={T:["Mutiny!","Nobody trusts anyone any more. The crew takes control of the ship and the journey ends at the nearest port."],S:["Out of food!","The hold is empty. The ship must stop at the nearest island and ask strangers for help."],M:["Despair","Nobody believes in New Harbour any more. The passengers refuse to sail on."]}[st.over]}
+  else if(tot>=19){ti="A united new home";tx="You reached New Harbour together. People trust each other, there is food on the table and children are laughing on the beach.";good=true}
+  else if(tot>=13){ti="A fragile but hopeful start";tx="You arrived, tired but alive. The new town has problems, but everyone is willing to work together.";good=true}
+  else{ti="Survivors, but scattered";tx="You arrived, but trust and supplies are very low. Groups disagree, and many want to leave and start again somewhere else."}
+  b.innerHTML=`<div class="box pop"><span class="tag">The ending · total ${tot}/30</span><h2 style="margin:6px 0">${esc(ti)}</h2><p>${esc(tx)}</p>
+  <h3 style="margin:14px 0 6px">What if…? Use the third conditional</h3><p class="hint">Say it aloud first: “If we had chosen…, we would have…”</p>
+  ${st.hist.map(h=>`<div class="role"><b>Chapter ${h.n}:</b> we chose “${esc(h.chose)}”.<br><span class="hint">If we had chosen “${esc(h.alt)}”, this might have happened: ${esc(h.altres)}</span></div>`).join("")}
+  <h3 style="margin:14px 0 6px">Discuss</h3><ol><li>Which decision changed the story most?</li><li>Which vote would you change? Why?</li><li>What did you learn about working as a team?</li></ol>
+  <div class="row"><button class="btn go big" id="stAgain">↺ Play again</button><button class="btn sun" id="stPrint">🖨 Print our journey</button></div></div>`;
+  $("#stAgain").onclick=stNew;$("#stPrint").onclick=()=>{$("#printArea").innerHTML=PR.story[2]();setTimeout(()=>print(),60)};
+  if(good){tada();confetti()}else buzz()}}
+$("#stRestart").onclick=stNew;
+stNew();
+/* ---------- static ---------- */
+$("#lbox").innerHTML=LB.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td></tr>`).join("");
+$("#gram").innerHTML=GRAM.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}<br><span class="hint">${r[2]}</span></td></tr>`).join("");
+$("#ideas").innerHTML=IDEAS.map(a=>`<div class="box act"><h3>${a.t}</h3>${a.g.map(x=>`<span class="tag">${x}</span>`).join("")}<ol>${a.s.map(x=>`<li>${x}</li>`).join("")}</ol></div>`).join("");
+$("#plan").innerHTML=PLAN.map(p=>`<tr><td><b>${p[0]}</b></td><td>${p[1]}</td></tr>`).join("");
+/* ---------- print ---------- */
+const ln=n=>'<div class="ln"></div>'.repeat(n);
+const PR={
+cards:["Dilemma cards","All 26 A/B cards to cut out",()=>`<h1>Dilemma cards</h1><div class="cut">${DIL.map(d=>`<div><b>A</b> ${esc(d[1])}<br><br><b>B</b> ${esc(d[2])}</div>`).join("")}</div>`],
+pads:["Vote paddles A / B","Big signs for the class",()=>`<h1>Vote paddles</h1><div class="cut pad"><div>A</div><div>B</div></div>`],
+plan:["Debate planner","Prepare your persuasion",()=>`<h1>My debate planner</h1><p>Name: ____________ My side: ☐ A ☐ B</p>${["My opinion (I’d rather…)","Reason 1 (because…)","Reason 2 (imagine if…)","Their best point and my answer (You have a point, but…)"].map(t=>`<div class="fr"><b>${t}</b>${ln(2)}</div>`).join("")}`],
+team:["Team decision sheet","For the survival challenge",()=>`<h1>Team decision sheet</h1><p>Team: ______________ Scenario: ______________</p><table class="pt"><tr><th>Item</th><th>Take (✔/✘)</th><th>Reason</th></tr>${Array.from({length:8},()=>`<tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td></tr>`).join("")}</table><h2>Our final decision</h2>${ln(3)}`],
+court:["Court role cards","Judge, defender, prosecutor…",()=>`<h1>Court role cards</h1><div class="cut">${ROLES.map(r=>`<div><b>${r[0]}</b><br>${esc(r[1])}<br><i>${esc(r[2])}</i></div>`).join("")}</div>`],
+lang:["Language mat","Phrases and grammar",()=>`<h1>My language mat</h1><table class="pt">${LB.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td></tr>`).join("")}</table><h2>Grammar</h2><table class="pt">${GRAM.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}<br><i>${r[2]}</i></td></tr>`).join("")}</table>`],
+story:["Story journey sheet","Our choices, results and what-ifs",()=>{const H=st.hist,rows=H.length?H.map(h=>`<tr><td>${h.n}. ${esc(h.t)}</td><td>${esc(h.chose)}</td><td>${esc(h.res)}</td></tr>`).join(""):Array.from({length:7},(_,i)=>`<tr><td>${i+1}.<br>&nbsp;</td><td></td><td></td></tr>`).join("");return`<h1>The Last Ship: our journey</h1><p>Team: ______________</p><table class="pt"><tr><th>Chapter</th><th>We chose</th><th>What happened</th></tr>${rows}</table><h2>What if…? (third conditional)</h2><p>If we had chosen…, we would have…</p>${ln(3)}<h2>My opinion</h2><p>The most important decision was… because…</p>${ln(3)}`}],
+score:["Score sheet","Side A vs Side B",()=>`<h1>Score sheet</h1><table class="pt"><tr><th>Dilemma</th><th>First vote A / B</th><th>Final vote A / B</th><th>Winner</th></tr>${Array.from({length:8},()=>`<tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td></tr>`).join("")}</table>`]};
+Object.entries(PR).forEach(([k,[t,d]])=>{const b=document.createElement("div");b.className="box";b.innerHTML=`<h3>${t}</h3><p class="hint">${d}</p><button class="btn sun">Print</button>`;b.querySelector("button").onclick=()=>{$("#printArea").innerHTML=PR[k][2]();setTimeout(()=>print(),60)};$("#prGrid").appendChild(b)});
+</script>
+</body>
+</html>
